@@ -2,93 +2,120 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>直播回放列表</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #131313;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      color: #ef4141;
+      margin: 20px;
+    }
+    h2 {
+      margin-left: 20px;
+    }
+    a {
+      text-decoration: none;
+      color: #ef4141;
+    }
+    .highlight {
+      color: #ef4141;
+    }
+    #historyList {
+      margin-left: 20px;
+      list-style: none;
+      padding: 0;
+    }
+    #historyList li {
+      margin: 5px 0;
+    }
+    .replay-card {
+      background: #1f1f1f;
+      margin: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .replay-card img {
+      width: 100%;
+    }
+    .title-overlay {
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      text-align: center;
+      padding: 5px;
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 20px;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>作品 <span class="highlight">直播回看</span></h1>
-  </header>
+  <h1>作品 <span class="highlight">直播回看</span></h1>
 
-  <main id="replayContainer">
-    <!-- 内容通过JS动态生成 -->
-  </main>
+  <!-- 历史记录区域 -->
+  <h2>最近播放记录</h2>
+  <ul id="historyList"></ul>
 
-  <!-- 访问量统计 -->
-  <footer>
-    <p>页面访问量：<span id="busuanzi_value_page_pv">加载中...</span></p>
-    <p>网站总访问量：<span id="busuanzi_value_site_pv">加载中...</span></p>
-  </footer>
-
-  <!-- 引入 Busuanzi 统计脚本 -->
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  <!-- 回放列表 -->
+  <div class="grid" id="replayContainer"></div>
 
   <script>
-    const DATA_URL = 'https://cdn.jsdelivr.net/gh/feixiangmax1126/live-replay@main/data.json?time=' + new Date().getTime();
+    const DATA_URL = "https://cdn.jsdelivr.net/gh/feixiangmax1126/live-replay@main/data.json";
 
+    // 加载历史记录
+    function loadHistory() {
+      const historyList = document.getElementById("historyList");
+      const history = JSON.parse(localStorage.getItem("playHistory") || "[]");
+
+      if (history.length === 0) {
+        historyList.innerHTML = "<li>暂无历史播放记录</li>";
+        return;
+      }
+
+      historyList.innerHTML = ""; // 清空历史记录
+      history.reverse().forEach(record => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <a href="player.html?url=${encodeURIComponent(record.url)}&title=${encodeURIComponent(record.title)}">
+            ${record.title} - ${record.time}
+          </a>
+        `;
+        historyList.appendChild(li);
+      });
+    }
+
+    // 加载回放列表
     fetch(DATA_URL)
-      .then(res => res.json())
+      .then(response => response.json())
       .then(data => {
-        data.sort((a, b) => (a.date < b.date ? 1 : -1));
-        const groupedByMonth = {};
-        data.forEach(item => {
-          const monthKey = item.date.slice(0,7);
-          if (!groupedByMonth[monthKey]) {
-            groupedByMonth[monthKey] = [];
-          }
-          groupedByMonth[monthKey].push(item);
-        });
-
-        const container = document.getElementById('replayContainer');
-        Object.keys(groupedByMonth).sort().reverse().forEach(monthKey => {
-          const monthTitle = document.createElement('h2');
-          monthTitle.textContent = monthKey;
-          monthTitle.classList.add('month-title');
-          container.appendChild(monthTitle);
-
-          const replayGrid = document.createElement('div');
-          replayGrid.classList.add('replay-grid');
-
-          groupedByMonth[monthKey].forEach(replay => {
-            const card = document.createElement('a');
-            card.href = `player.html?url=${encodeURIComponent(replay.m3u8)}`;
-            card.classList.add('replay-card');
-
-            const img = document.createElement('img');
-            img.src = replay.thumbnail;
-            img.alt = replay.title;
-            img.classList.add('replay-thumbnail');
-
-            const titleOverlay = document.createElement('div');
-            titleOverlay.classList.add('title-overlay');
-            titleOverlay.textContent = `${replay.date} - ${replay.title}`;
-
-            const infoBar = document.createElement('div');
-            infoBar.classList.add('info-bar');
-
-            const dateSpan = document.createElement('span');
-            dateSpan.textContent = replay.date;
-
-            const viewsSpan = document.createElement('span');
-            viewsSpan.textContent = replay.views + ' 观看';
-
-            infoBar.appendChild(dateSpan);
-            infoBar.appendChild(viewsSpan);
-
-            card.appendChild(img);
-            card.appendChild(titleOverlay);
-            card.appendChild(infoBar);
-            replayGrid.appendChild(card);
-          });
-
-          container.appendChild(replayGrid);
+        const container = document.getElementById("replayContainer");
+        data.forEach(replay => {
+          const card = document.createElement("a");
+          card.href = `player.html?url=${encodeURIComponent(replay.m3u8)}&title=${encodeURIComponent(replay.title)}`;
+          card.classList.add("replay-card");
+          card.innerHTML = `
+            <img src="${replay.thumbnail}" alt="${replay.title}" />
+            <div class="title-overlay">${replay.date} - ${replay.title}</div>
+          `;
+          container.appendChild(card);
         });
       })
       .catch(err => {
-        console.error('数据加载失败:', err);
-        document.getElementById('replayContainer').textContent = '无法加载回放数据，请稍后重试。';
+        console.error("数据加载失败:", err);
+        document.getElementById("replayContainer").innerHTML = "<p>无法加载回放数据，请稍后重试。</p>";
       });
+
+    loadHistory();
   </script>
 </body>
 </html>
