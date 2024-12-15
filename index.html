@@ -32,14 +32,19 @@
       margin: 5px 0;
     }
     .replay-card {
+      flex: 0 0 calc(20% - 10px);
+      max-width: calc(20% - 10px);
+      box-sizing: border-box;
       background: #1f1f1f;
-      margin: 10px;
+      margin: 5px;
       border-radius: 8px;
       overflow: hidden;
       cursor: pointer;
+      text-align: center;
     }
     .replay-card img {
       width: 100%;
+      height: auto;
     }
     .title-overlay {
       background: rgba(0, 0, 0, 0.7);
@@ -48,18 +53,19 @@
       padding: 5px;
       font-size: 14px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      margin: 20px;
-    }
     .month-header {
-      margin: 20px;
+      margin: 20px 10px 10px 20px;
       font-size: 18px;
       color: #ef4141;
       border-bottom: 2px solid #ef4141;
       padding-bottom: 5px;
+    }
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 10px;
+      margin: 10px;
     }
   </style>
 </head>
