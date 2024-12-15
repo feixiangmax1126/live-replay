@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>直播回放列表</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- 百度统计代码 -->
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?你的统计ID"; <!-- 替换为你的百度统计ID -->
+      var s = document.getElementsByTagName("script")[0]; 
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 </head>
 <body>
   <header>
@@ -15,9 +25,17 @@
     <!-- 内容通过JS动态生成 -->
   </main>
 
+  <!-- 访问量计数器 -->
+  <footer>
+    <p>访问量：</p>
+    <a href="https://www.hitwebcounter.com" target="_blank">
+      <img src="https://hitwebcounter.com/counter/counter.php?page=1234567&style=0001&nbdigits=5&type=ip&initCount=0" 
+           title="Free Counter" Alt="web counter" border="0" />
+    </a>
+  </footer>
+
   <script>
-    // 请将 URL 替换为你自己的 data.json 原始地址
-    const DATA_URL = 'https://raw.githubusercontent.com/feixiangmax1126/live-replay/refs/heads/main/data.json';
+    const DATA_URL = 'https://raw.githubusercontent.com/你的用户名/你的仓库名/main/data.json'; // 替换为你的data.json地址
 
     fetch(DATA_URL)
       .then(res => res.json())
@@ -36,7 +54,6 @@
         });
 
         const container = document.getElementById('replayContainer');
-        // 按月份倒序（最新的月份在最上方）
         Object.keys(groupedByMonth).sort().reverse().forEach(monthKey => {
           const monthTitle = document.createElement('h2');
           monthTitle.textContent = monthKey;
@@ -56,9 +73,10 @@
             img.alt = replay.title;
             img.classList.add('replay-thumbnail');
 
+            // 显示日期和标题
             const titleOverlay = document.createElement('div');
             titleOverlay.classList.add('title-overlay');
-            titleOverlay.textContent = replay.title;
+            titleOverlay.textContent = `${replay.date} - ${replay.title}`;
 
             const infoBar = document.createElement('div');
             infoBar.classList.add('info-bar');
@@ -82,7 +100,7 @@
         });
       })
       .catch(err => {
-        console.error('数据获取失败:', err);
+        console.error('数据加载失败:', err);
         document.getElementById('replayContainer').textContent = '无法加载回放数据，请稍后重试。';
       });
   </script>
