@@ -54,6 +54,13 @@
       gap: 10px;
       margin: 20px;
     }
+    .month-header {
+      margin: 20px;
+      font-size: 18px;
+      color: #ef4141;
+      border-bottom: 2px solid #ef4141;
+      padding-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -64,7 +71,7 @@
   <ul id="historyList"></ul>
 
   <!-- 回放列表 -->
-  <div class="grid" id="replayContainer"></div>
+  <div id="replayContainer"></div>
 
   <script>
     const DATA_URL = 'https://cdn.jsdelivr.net/gh/feixiangmax1126/live-replay@main/data.json?time=' + new Date().getTime();
@@ -91,22 +98,50 @@
       });
     }
 
+    // 按月份分组数据
+    function groupByMonth(data) {
+      const grouped = {};
+      data.forEach(replay => {
+        const month = replay.date.slice(0, 7); // 提取年份-月份
+        if (!grouped[month]) {
+          grouped[month] = [];
+        }
+        grouped[month].push(replay);
+      });
+      return grouped;
+    }
+
     // 加载回放列表
     fetch(DATA_URL)
       .then(response => response.json())
       .then(data => {
         const container = document.getElementById("replayContainer");
-        data.forEach(replay => {
-          const card = document.createElement("a");
-          // 将 date 和 title 作为参数传递
-          card.href = `player.html?url=${encodeURIComponent(replay.m3u8)}&date=${encodeURIComponent(replay.date)}&title=${encodeURIComponent(replay.title)}`;
-          card.classList.add("replay-card");
-          card.innerHTML = `
-            <img src="${replay.thumbnail}" alt="${replay.title}" />
-            <div class="title-overlay">${replay.date} - ${replay.title}</div>
-          `;
-          container.appendChild(card);
-        });
+        const groupedData = groupByMonth(data);
+
+        for (const month in groupedData) {
+          // 添加月份标题
+          const monthHeader = document.createElement("div");
+          monthHeader.classList.add("month-header");
+          monthHeader.textContent = month;
+          container.appendChild(monthHeader);
+
+          // 添加当前月份的回放列表
+          const grid = document.createElement("div");
+          grid.classList.add("grid");
+
+          groupedData[month].forEach(replay => {
+            const card = document.createElement("a");
+            card.href = `player.html?url=${encodeURIComponent(replay.m3u8)}&date=${encodeURIComponent(replay.date)}&title=${encodeURIComponent(replay.title)}`;
+            card.classList.add("replay-card");
+            card.innerHTML = `
+              <img src="${replay.thumbnail}" alt="${replay.title}" />
+              <div class="title-overlay">${replay.date} - ${replay.title}</div>
+            `;
+            grid.appendChild(card);
+          });
+
+          container.appendChild(grid);
+        }
       })
       .catch(err => {
         console.error("数据加载失败:", err);
