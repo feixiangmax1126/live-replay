@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>播放器</title>
+  <title>播放器</title> <!-- 初始标题 -->
   <style>
     body {
       margin: 0;
@@ -26,7 +26,7 @@
   </style>
 </head>
 <body>
-  <h1>播放器</h1>
+  <h1 id="videoTitle">播放器</h1> <!-- 显示视频标题 -->
   <video id="videoPlayer" controls></video>
 
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -38,8 +38,16 @@
     }
 
     const streamUrl = getParameterByName('url');
-    const title = decodeURIComponent(getParameterByName('title')) || "未命名视频";
+    const date = decodeURIComponent(getParameterByName('date')) || "未知日期"; // 获取视频日期
+    const title = decodeURIComponent(getParameterByName('title')) || "未命名视频"; // 获取视频标题
+    const fullTitle = `${date} - ${title}`; // 拼接完整标题
     const video = document.getElementById('videoPlayer');
+    const videoTitle = document.getElementById('videoTitle');
+
+    // 动态设置网页标题和标题显示区域
+    document.title = fullTitle;
+    videoTitle.textContent = fullTitle;
+
     let savedProgress = 0;
 
     if (!streamUrl) {
@@ -75,7 +83,7 @@
       function saveHistory() {
         const now = new Date().toLocaleString();
         const progress = video.currentTime;
-        const record = { title, url: streamUrl, time: now, progress };
+        const record = { title: fullTitle, url: streamUrl, time: now, progress };
 
         let history = JSON.parse(localStorage.getItem("playHistory") || "[]");
         const index = history.findIndex(item => item.url === streamUrl);
