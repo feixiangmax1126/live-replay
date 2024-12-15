@@ -2,26 +2,33 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>播放页面</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>播放器</title>
   <style>
     body {
       margin: 0;
       background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
       height: 100vh;
     }
     video {
       width: 80%;
       max-width: 800px;
-      background: #000;
+    }
+    h1 {
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
+  <h1>播放器</h1>
   <video id="videoPlayer" controls></video>
+
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
     function getParameterByName(name) {
@@ -29,10 +36,10 @@
       const params = new URLSearchParams(url);
       return params.get(name);
     }
-    
+
     const streamUrl = getParameterByName('url');
     const video = document.getElementById('videoPlayer');
-    
+
     if (!streamUrl) {
       alert("未提供播放地址！");
     } else {
@@ -51,6 +58,24 @@
       } else {
         alert("当前浏览器不支持 M3U8 播放，请尝试使用现代浏览器。");
       }
+
+      saveHistory();
+    }
+
+    // 保存历史记录
+    function saveHistory() {
+      const title = decodeURIComponent(getParameterByName('title')) || "未命名视频";
+      const now = new Date().toLocaleString();
+      const record = {
+        title: title,
+        url: streamUrl,
+        time: now
+      };
+
+      let history = JSON.parse(localStorage.getItem("playHistory") || "[]");
+      history.push(record);
+      if (history.length > 10) history.shift(); // 最多保留10条记录
+      localStorage.setItem("playHistory", JSON.stringify(history));
     }
   </script>
 </body>
