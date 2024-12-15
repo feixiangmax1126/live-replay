@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>直播回放列表</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>作品 <span class="highlight">直播回看</span></h1>
+  </header>
+
+  <main id="replayContainer">
+    <!-- 内容通过JS动态生成 -->
+  </main>
+
+  <script>
+    // 请将 URL 替换为你自己的 data.json 原始地址
+    const DATA_URL = 'https://raw.githubusercontent.com/你的用户名/你的仓库名/main/data.json';
+
+    fetch(DATA_URL)
+      .then(res => res.json())
+      .then(data => {
+        // 按日期倒序排列
+        data.sort((a, b) => (a.date < b.date ? 1 : -1));
+
+        // 按月份分组
+        const groupedByMonth = {};
+        data.forEach(item => {
+          const monthKey = item.date.slice(0,7); // "YYYY-MM"
+          if(!groupedByMonth[monthKey]) {
+            groupedByMonth[monthKey] = [];
+          }
+          groupedByMonth[monthKey].push(item);
+        });
+
+        const container = document.getElementById('replayContainer');
+        // 按月份倒序（最新的月份在最上方）
+        Object.keys(groupedByMonth).sort().reverse().forEach(monthKey => {
+          const monthTitle = document.createElement('h2');
+          monthTitle.textContent = monthKey;
+          monthTitle.classList.add('month-title');
+          container.appendChild(monthTitle);
+
+          const replayGrid = document.createElement('div');
+          replayGrid.classList.add('replay-grid');
+
+          groupedByMonth[monthKey].forEach(replay => {
+            const card = document.createElement('a');
+            card.href = `player.html?url=${encodeURIComponent(replay.m3u8)}`;
+            card.classList.add('replay-card');
+
+            const img = document.createElement('img');
+            img.src = replay.thumbnail;
+            img.alt = replay.title;
+            img.classList.add('replay-thumbnail');
+
+            const titleOverlay = document.createElement('div');
+            titleOverlay.classList.add('title-overlay');
+            titleOverlay.textContent = replay.title;
+
+            const infoBar = document.createElement('div');
+            infoBar.classList.add('info-bar');
+
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = replay.date;
+
+            const viewsSpan = document.createElement('span');
+            viewsSpan.textContent = replay.views + ' 观看';
+
+            infoBar.appendChild(dateSpan);
+            infoBar.appendChild(viewsSpan);
+
+            card.appendChild(img);
+            card.appendChild(titleOverlay);
+            card.appendChild(infoBar);
+            replayGrid.appendChild(card);
+          });
+
+          container.appendChild(replayGrid);
+        });
+      })
+      .catch(err => {
+        console.error('数据获取失败:', err);
+        document.getElementById('replayContainer').textContent = '无法加载回放数据，请稍后重试。';
+      });
+  </script>
+</body>
+</html>
