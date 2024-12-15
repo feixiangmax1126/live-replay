@@ -38,7 +38,9 @@
     }
 
     const streamUrl = getParameterByName('url');
+    const title = decodeURIComponent(getParameterByName('title')) || "未命名视频";
     const video = document.getElementById('videoPlayer');
+    let savedProgress = 0;
 
     if (!streamUrl) {
       alert("未提供播放地址！");
@@ -47,35 +49,45 @@
         var hls = new Hls();
         hls.loadSource(streamUrl);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
           video.play();
+          loadProgress();
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = streamUrl;
-        video.addEventListener('loadedmetadata', function() {
+        video.addEventListener('loadedmetadata', function () {
+          loadProgress();
           video.play();
         });
-      } else {
-        alert("当前浏览器不支持 M3U8 播放，请尝试使用现代浏览器。");
       }
 
-      saveHistory();
-    }
+      // 加载进度
+      function loadProgress() {
+        const history = JSON.parse(localStorage.getItem("playHistory") || "[]");
+        const existingRecord = history.find(record => record.url === streamUrl);
+        if (existingRecord) {
+          savedProgress = existingRecord.progress || 0;
+          video.currentTime = savedProgress; // 跳转到上次播放时间
+        }
+      }
 
-    // 保存历史记录
-    function saveHistory() {
-      const title = decodeURIComponent(getParameterByName('title')) || "未命名视频";
-      const now = new Date().toLocaleString();
-      const record = {
-        title: title,
-        url: streamUrl,
-        time: now
-      };
+      // 保存历史记录和播放进度
+      function saveHistory() {
+        const now = new Date().toLocaleString();
+        const progress = video.currentTime;
+        const record = { title, url: streamUrl, time: now, progress };
 
-      let history = JSON.parse(localStorage.getItem("playHistory") || "[]");
-      history.push(record);
-      if (history.length > 10) history.shift(); // 最多保留10条记录
-      localStorage.setItem("playHistory", JSON.stringify(history));
+        let history = JSON.parse(localStorage.getItem("playHistory") || "[]");
+        const index = history.findIndex(item => item.url === streamUrl);
+        if (index !== -1) history.splice(index, 1); // 删除旧的记录
+        history.push(record);
+
+        if (history.length > 10) history.shift();
+        localStorage.setItem("playHistory", JSON.stringify(history));
+      }
+
+      setInterval(saveHistory, 1000); // 每5秒保存一次进度
+      window.addEventListener('beforeunload', saveHistory);
     }
   </script>
 </body>
