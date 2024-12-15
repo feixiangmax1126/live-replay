@@ -23,9 +23,6 @@
       text-decoration: none;
       color: #ef4141;
     }
-    .highlight {
-      color: #ef4141;
-    }
     #historyList {
       margin-left: 20px;
       list-style: none;
@@ -87,7 +84,7 @@
         const li = document.createElement("li");
         li.innerHTML = `
           <a href="player.html?url=${encodeURIComponent(record.url)}&title=${encodeURIComponent(record.title)}">
-            ${record.title} - ${record.time}
+            ${record.title} - ${record.time} (进度: ${Math.floor(record.progress)} 秒)
           </a>
         `;
         historyList.appendChild(li);
