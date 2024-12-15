@@ -83,7 +83,7 @@
       history.reverse().forEach(record => {
         const li = document.createElement("li");
         li.innerHTML = `
-          <a href="player.html?url=${encodeURIComponent(record.url)}&title=${encodeURIComponent(record.title)}">
+          <a href="player.html?url=${encodeURIComponent(record.url)}&date=${encodeURIComponent(record.title.split(' - ')[0])}&title=${encodeURIComponent(record.title.split(' - ')[1])}">
             ${record.title} - ${record.time} (进度: ${Math.floor(record.progress)} 秒)
           </a>
         `;
@@ -98,7 +98,8 @@
         const container = document.getElementById("replayContainer");
         data.forEach(replay => {
           const card = document.createElement("a");
-          card.href = `player.html?url=${encodeURIComponent(replay.m3u8)}&title=${encodeURIComponent(replay.title)}`;
+          // 将 date 和 title 作为参数传递
+          card.href = `player.html?url=${encodeURIComponent(replay.m3u8)}&date=${encodeURIComponent(replay.date)}&title=${encodeURIComponent(replay.title)}`;
           card.classList.add("replay-card");
           card.innerHTML = `
             <img src="${replay.thumbnail}" alt="${replay.title}" />
