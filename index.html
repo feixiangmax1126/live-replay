@@ -5,16 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>直播回放列表</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- 百度统计代码 -->
-  <script>
-    var _hmt = _hmt || [];
-    (function() {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?你的统计ID"; <!-- 替换为你的百度统计ID -->
-      var s = document.getElementsByTagName("script")[0]; 
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 </head>
 <body>
   <header>
@@ -25,29 +15,22 @@
     <!-- 内容通过JS动态生成 -->
   </main>
 
-  <!-- 访问量计数器 -->
+  <!-- 访问量统计 -->
   <footer>
-    <p>访问量：</p>
-    <a href="https://www.hitwebcounter.com" target="_blank">
-      <img src="https://hitwebcounter.com/counter/counter.php?page=1234567&style=0001&nbdigits=5&type=ip&initCount=0" 
-           title="Free Counter" Alt="web counter" border="0" />
-    </a>
+    <p>访问量：<span id="visitCount">加载中...</span></p>
   </footer>
 
   <script>
-    const DATA_URL = 'https://raw.githubusercontent.com/feixiangmax1126/live-replay/main/data.json'; // 替换为你的data.json地址
+    const DATA_URL = 'https://raw.githubusercontent.com/feixiangmax1126/live-replay/main/data.json';
 
     fetch(DATA_URL)
       .then(res => res.json())
       .then(data => {
-        // 按日期倒序排列
         data.sort((a, b) => (a.date < b.date ? 1 : -1));
-
-        // 按月份分组
         const groupedByMonth = {};
         data.forEach(item => {
-          const monthKey = item.date.slice(0,7); // "YYYY-MM"
-          if(!groupedByMonth[monthKey]) {
+          const monthKey = item.date.slice(0,7);
+          if (!groupedByMonth[monthKey]) {
             groupedByMonth[monthKey] = [];
           }
           groupedByMonth[monthKey].push(item);
@@ -73,7 +56,6 @@
             img.alt = replay.title;
             img.classList.add('replay-thumbnail');
 
-            // 显示日期和标题
             const titleOverlay = document.createElement('div');
             titleOverlay.classList.add('title-overlay');
             titleOverlay.textContent = `${replay.date} - ${replay.title}`;
@@ -102,6 +84,18 @@
       .catch(err => {
         console.error('数据加载失败:', err);
         document.getElementById('replayContainer').textContent = '无法加载回放数据，请稍后重试。';
+      });
+
+    // 访问量统计代码
+    const countApiUrl = 'https://api.countapi.xyz/hit/你的用户名/你的仓库名';
+    fetch(countApiUrl)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('visitCount').innerText = data.value;
+      })
+      .catch(error => {
+        console.error('访问量统计失败:', error);
+        document.getElementById('visitCount').innerText = '统计失败';
       });
   </script>
 </body>
