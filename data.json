@@ -1,7 +1,14 @@
 [
   {
-    "date": "2024-12-19",
+    "date": "2025-02-05",
     "title": "最新回放",
+    "thumbnail": "https://p2-pro.a.yximgs.com/uhead/AB/2024/05/29/18/BMjAyNDA1MjkxODQyMzFfMTc5NzQ2MDI5M19vYzEyNDE1NzY0MDk3X2x2.jpg",
+    "m3u8": "https://alivod.a.yximgs.com/livedvr/flv2ts/gifshow/vTBvg_07x7k_avc1000m.1738677165859-20595763.0-16.m3u8?auth_key=1739357622-2061333709-0-9a4fe2f9224aedec002e5b9c23a8adf2",
+    "views": "999999+"
+  },
+  {
+    "date": "2024-12-19",
+    "title": "回放",
     "thumbnail": "https://p2-pro.a.yximgs.com/uhead/AB/2024/05/29/18/BMjAyNDA1MjkxODQyMzFfMTc5NzQ2MDI5M19vYzEyNDE1NzY0MDk3X2x2.jpg",
     "m3u8": "https://alivod.a.yximgs.com/livedvr/flv2ts/gifshow/lWAxi9TxgNc_avc1000m.1734528647373-19425137.0-16.m3u8?auth_key=1735157982-808946899-0-4a0b9a1e7fe3ce81cd580ae9861a6d91",
     "views": "999999+"
